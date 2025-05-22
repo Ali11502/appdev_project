@@ -2,14 +2,13 @@ import '../components/my_description_box.dart';
 import '../components/my_drawer.dart';
 import '../components/my_food_tile.dart';
 import '../components/my_tab_bar.dart';
+import '../components/my_menu_loader.dart'; // Add this import
 import '../pages/food_page.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../components/my_current_location.dart';
 import '../components/my_sliver_app_bar.dart';
 import '../models/food.dart';
-import '../models/restaurant.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,6 +20,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+
   @override
   void initState() {
     super.initState();
@@ -35,13 +35,13 @@ class _HomePageState extends State<HomePage>
     _tabController.dispose();
     super.dispose();
   }
-  // sort out and return a list of food items that belong to a specific category
 
+  // Sort out and return a list of food items that belong to a specific category
   List<Food> _filterMenuByCategory(FoodCategory category, List<Food> fullMenu) {
     return fullMenu.where((food) => food.category == category).toList();
   }
 
-  // return list of foods in given category
+  // Return list of foods in given category
   List<Widget> getFoodInThisCategory(List<Food> fullMenu) {
     return FoodCategory.values.map((category) {
       List<Food> categoryMenu = _filterMenuByCategory(category, fullMenu);
@@ -49,7 +49,6 @@ class _HomePageState extends State<HomePage>
       return ListView.builder(
         itemCount: categoryMenu.length,
         physics: const NeverScrollableScrollPhysics(),
-        // padding: EdgeInsets.zero,
         itemBuilder: (context, index) {
           final food = categoryMenu[index];
           return FoodTile(
@@ -82,7 +81,6 @@ class _HomePageState extends State<HomePage>
                       endIndent: 25,
                       color: Theme.of(context).colorScheme.secondary,
                     ),
-
                     MyCurrentLocation(),
                     // description box
                     const MyDescriptionBox(),
@@ -90,11 +88,11 @@ class _HomePageState extends State<HomePage>
                 ),
               ),
             ],
-        body: Consumer<Restaurant>(
+        body: MyMenuLoader(
           builder:
-              (context, restaurant, child) => TabBarView(
+              (menu) => TabBarView(
                 controller: _tabController,
-                children: getFoodInThisCategory(restaurant.menu),
+                children: getFoodInThisCategory(menu),
               ),
         ),
       ),

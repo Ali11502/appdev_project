@@ -2,141 +2,199 @@ import 'cart_item.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 import 'food.dart';
-import 'package:date_format/date_format.dart'; // Make sure to import this package
+import 'package:date_format/date_format.dart';
+import '../services/database/firestore.dart'; // Import the FirestoreService
 
 class Restaurant extends ChangeNotifier {
-  // list of food menu
-  final List<Food> _menu = [
-    // burgers
-    Food(
-      name: "Classic Cheeseburger",
-      description:
-          "A juicy beef patty with melted cheddar, lettuce, tomato, and a hint of onion and pickle.",
-      imagePath: "lib/images/burgers.jpg",
-      price: 8.99,
-      category: FoodCategory.burgers,
-      availableAddons: [
-        Addon(name: "Extra Cheese", price: 0.99),
-        Addon(name: "Bacon", price: 1.49),
-        Addon(name: "Avocado", price: 1.99),
-      ],
-    ),
+  // Firebase service instance
+  final FirestoreService _firestoreService = FirestoreService();
 
-    // burgers
-    Food(
-      name: "Classic ChickenBurger",
-      description:
-          "A juicy beef patty with melted cheddar, lettuce, tomato, and a hint of onion and pickle.",
-      imagePath: "lib/images/burgers.jpg",
-      price: 8.99,
-      category: FoodCategory.burgers,
-      availableAddons: [Addon(name: "Avocado", price: 1.99)],
-    ),
-    // desserts
-    Food(
-      name: "Plain cake",
-      description: "simple sweet cake.",
-      imagePath: "lib/images/desserts.jpg",
-      price: 8.99,
-      category: FoodCategory.desserts,
-      availableAddons: [Addon(name: "Chocolate syrup topping", price: 0.5)],
-    ),
-    Food(
-      name: "Chocolate Cake",
-      description: "Chocolate cake with topping of melted dairymilk.",
-      imagePath: "lib/images/desserts.jpg",
-      price: 10.0,
-      category: FoodCategory.desserts,
-      availableAddons: [Addon(name: "Bunties", price: 0.25)],
-    ),
-    //drinks
-    Food(
-      name: "Cola Next",
-      description: "Local clone of Pepsi.",
-      imagePath: "lib/images/drinks.jpg",
-      price: 2.99,
-      category: FoodCategory.drinks,
-      availableAddons: [Addon(name: "some extra ice", price: 0.1)],
-    ),
+  // Private menu list - will be populated from Firebase
+  List<Food> _menu = [];
 
-    Food(
-      name: "Fizz up ",
-      description: "Local clone of 7up.",
-      imagePath: "lib/images/drinks.jpg",
-      price: 2.99,
-      category: FoodCategory.drinks,
-      availableAddons: [],
-    ),
-    //sides
-    Food(
-      name: "Smashed Potato",
-      description: "smashed potato",
-      imagePath: "lib/images/sides.jpg",
-      price: 2.99,
-      category: FoodCategory.sides,
-      availableAddons: [],
-    ),
-    Food(
-      name: "Boiled rice",
-      description: "Boiled rice.",
-      imagePath: "lib/images/sides.jpg",
-      price: 2.99,
-      category: FoodCategory.sides,
-      availableAddons: [],
-    ),
-    // salad
-    Food(
-      name: "Ceaser salas",
-      description: "ceaser sauce",
-      imagePath: "lib/images/salads.jpg",
-      price: 1.0,
-      category: FoodCategory.salads,
-      availableAddons: [Addon(name: "some Ceaser sauce", price: 0.1)],
-    ),
-    Food(
-      name: "Russian salad",
-      description: "Russian sauce",
-      imagePath: "lib/images/salads.jpg",
-      price: 1.0,
-      category: FoodCategory.salads,
-      availableAddons: [Addon(name: "some Russian sauce", price: 0.1)],
-    ),
-  ];
+  // Loading state for menu
+  bool _isMenuLoading = false;
 
+  // Error state for menu loading
+  String? _menuError;
+
+  // Getters
   List<Food> get menu => _menu;
   List<CartItem> get cart => _cart;
+  bool get isMenuLoading => _isMenuLoading;
+  String? get menuError => _menuError;
+
   final List<CartItem> _cart = [];
   double _deliveryCharges = 9.99;
   String _deliveryAddress = 'none';
   String get deliveryAddress => _deliveryAddress;
-  //add,remove,get total price, total items in cart
-  void addToCart(Food food, List<Addon> selectedAddons) {
-    // see if there is a cart item already with the same food and selected addons
-    CartItem? cartItem = _cart.firstWhereOrNull((item) {
-      // check if the food items are the same
-      bool isSameFood = item.food == food;
 
-      // check if the list of selected addons are the same
+  // Constructor - automatically load menu when Restaurant is created
+  Restaurant() {
+    loadMenuFromFirebase();
+  }
+
+  // Load menu from Firebase
+  Future<void> loadMenuFromFirebase() async {
+    _isMenuLoading = true;
+    _menuError = null;
+    notifyListeners();
+
+    try {
+      _menu = await _firestoreService.getMenuItems();
+      _menuError = null;
+    } catch (e) {
+      _menuError = 'Failed to load menu: $e';
+      _menu = _getHardcodedMenuAsFallback(); // Fallback to hardcoded menu
+    } finally {
+      _isMenuLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Refresh menu from Firebase
+  Future<void> refreshMenu() async {
+    await loadMenuFromFirebase();
+  }
+
+  // Get menu items by category
+  Future<List<Food>> getMenuByCategory(FoodCategory category) async {
+    try {
+      return await _firestoreService.getMenuItemsByCategory(category);
+    } catch (e) {
+      // Fallback to filtering local menu
+      return _menu.where((food) => food.category == category).toList();
+    }
+  }
+
+  // One-time method to migrate hardcoded data to Firebase
+  // Call this once to populate your Firestore database
+  Future<void> migrateHardcodedMenuToFirebase() async {
+    List<Food> hardcodedMenu = _getHardcodedMenuAsFallback();
+    try {
+      await _firestoreService.populateInitialMenuData(hardcodedMenu);
+      print('Successfully migrated menu to Firebase!');
+    } catch (e) {
+      print('Error migrating menu: $e');
+    }
+  }
+
+  // Fallback hardcoded menu (keep as backup)
+  List<Food> _getHardcodedMenuAsFallback() {
+    return [
+      // burgers
+      Food(
+        name: "Classic Cheeseburger",
+        description:
+            "A juicy beef patty with melted cheddar, lettuce, tomato, and a hint of onion and pickle.",
+        imagePath: "lib/images/burgers.jpg",
+        price: 8.99,
+        category: FoodCategory.burgers,
+        availableAddons: [
+          Addon(name: "Extra Cheese", price: 0.99),
+          Addon(name: "Bacon", price: 1.49),
+          Addon(name: "Avocado", price: 1.99),
+        ],
+      ),
+      Food(
+        name: "Classic ChickenBurger",
+        description:
+            "A juicy beef patty with melted cheddar, lettuce, tomato, and a hint of onion and pickle.",
+        imagePath: "lib/images/burgers.jpg",
+        price: 8.99,
+        category: FoodCategory.burgers,
+        availableAddons: [Addon(name: "Avocado", price: 1.99)],
+      ),
+      // desserts
+      Food(
+        name: "Plain cake",
+        description: "simple sweet cake.",
+        imagePath: "lib/images/desserts.jpg",
+        price: 8.99,
+        category: FoodCategory.desserts,
+        availableAddons: [Addon(name: "Chocolate syrup topping", price: 0.5)],
+      ),
+      Food(
+        name: "Chocolate Cake",
+        description: "Chocolate cake with topping of melted dairymilk.",
+        imagePath: "lib/images/desserts.jpg",
+        price: 10.0,
+        category: FoodCategory.desserts,
+        availableAddons: [Addon(name: "Bunties", price: 0.25)],
+      ),
+      //drinks
+      Food(
+        name: "Cola Next",
+        description: "Local clone of Pepsi.",
+        imagePath: "lib/images/drinks.jpg",
+        price: 2.99,
+        category: FoodCategory.drinks,
+        availableAddons: [Addon(name: "some extra ice", price: 0.1)],
+      ),
+      Food(
+        name: "Fizz up ",
+        description: "Local clone of 7up.",
+        imagePath: "lib/images/drinks.jpg",
+        price: 2.99,
+        category: FoodCategory.drinks,
+        availableAddons: [],
+      ),
+      //sides
+      Food(
+        name: "Smashed Potato",
+        description: "smashed potato",
+        imagePath: "lib/images/sides.jpg",
+        price: 2.99,
+        category: FoodCategory.sides,
+        availableAddons: [],
+      ),
+      Food(
+        name: "Boiled rice",
+        description: "Boiled rice.",
+        imagePath: "lib/images/sides.jpg",
+        price: 2.99,
+        category: FoodCategory.sides,
+        availableAddons: [],
+      ),
+      // salad
+      Food(
+        name: "Ceaser salas",
+        description: "ceaser sauce",
+        imagePath: "lib/images/salads.jpg",
+        price: 1.0,
+        category: FoodCategory.salads,
+        availableAddons: [Addon(name: "some Ceaser sauce", price: 0.1)],
+      ),
+      Food(
+        name: "Russian salad",
+        description: "Russian sauce",
+        imagePath: "lib/images/salads.jpg",
+        price: 1.0,
+        category: FoodCategory.salads,
+        availableAddons: [Addon(name: "some Russian sauce", price: 0.1)],
+      ),
+    ];
+  }
+
+  // === EXISTING CART METHODS (unchanged) ===
+  void addToCart(Food food, List<Addon> selectedAddons) {
+    CartItem? cartItem = _cart.firstWhereOrNull((item) {
+      bool isSameFood = item.food == food;
       bool isSameAddons = ListEquality().equals(
         item.selectedAddons,
         selectedAddons,
       );
-
       return isSameFood && isSameAddons;
     });
 
-    // if item already exists, increase it's quantity
     if (cartItem != null) {
       cartItem.quantity++;
-    }
-    // otherwise, add a new cart item to the cart
-    else {
+    } else {
       _cart.add(CartItem(food: food, selectedAddons: selectedAddons));
     }
     notifyListeners();
   }
 
-  // remove from cart
   void removeFromCart(CartItem cartItem) {
     int cartIndex = _cart.indexOf(cartItem);
 
@@ -150,7 +208,6 @@ class Restaurant extends ChangeNotifier {
     notifyListeners();
   }
 
-  // get total price of cart
   double getTotalPrice() {
     double total = 0.00;
 
@@ -167,7 +224,6 @@ class Restaurant extends ChangeNotifier {
     return total + _deliveryCharges;
   }
 
-  // get total number of items in cart
   int getTotalItemCount() {
     int totalItemCount = 0;
 
@@ -188,14 +244,11 @@ class Restaurant extends ChangeNotifier {
     notifyListeners();
   }
 
-  //generate a receipt, double value to money,
-  // generate a receipt
   String displayCartReceipt() {
     final receipt = StringBuffer();
     receipt.writeln("Here's your receipt");
     receipt.writeln();
 
-    // format the date to include up to seconds only
     String formattedDate = formatDate(DateTime.now(), [
       yyyy,
       '-',
@@ -234,12 +287,10 @@ class Restaurant extends ChangeNotifier {
     return receipt.toString();
   }
 
-  // format double value into money
   String _formatPrice(double price) {
     return "\$${price.toStringAsFixed(2)}";
   }
 
-  // format list of addons into a string summary
   String _formatAddons(List<Addon> addons) {
     return addons
         .map((addon) => "${addon.name} (${_formatPrice(addon.price)})")
