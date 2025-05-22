@@ -27,7 +27,6 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage> {
     super.initState();
     String receipt = context.read<Restaurant>().displayCartReceipt();
     db.saveOrderToDatabase(receipt);
-    clearCart();
   }
 
   @override
@@ -39,6 +38,8 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage> {
         leading: IconButton(
           icon: const Icon(Icons.home),
           onPressed: () {
+            clearCart();
+
             // Navigate to your home page
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(

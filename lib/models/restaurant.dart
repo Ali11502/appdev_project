@@ -106,6 +106,7 @@ class Restaurant extends ChangeNotifier {
   List<Food> get menu => _menu;
   List<CartItem> get cart => _cart;
   final List<CartItem> _cart = [];
+  double _deliveryCharges = 9.99;
   String _deliveryAddress = 'none';
   String get deliveryAddress => _deliveryAddress;
   //add,remove,get total price, total items in cart
@@ -151,7 +152,7 @@ class Restaurant extends ChangeNotifier {
 
   // get total price of cart
   double getTotalPrice() {
-    double total = 0.0;
+    double total = 0.00;
 
     for (CartItem cartItem in _cart) {
       double itemTotal = cartItem.food.price;
@@ -163,7 +164,7 @@ class Restaurant extends ChangeNotifier {
       total += itemTotal * cartItem.quantity;
     }
 
-    return total;
+    return total + _deliveryCharges;
   }
 
   // get total number of items in cart
@@ -226,8 +227,9 @@ class Restaurant extends ChangeNotifier {
     receipt.writeln("------------");
     receipt.writeln();
     receipt.writeln("Total Items: ${getTotalItemCount()}");
-    receipt.writeln("Total Price: ${_formatPrice(getTotalPrice())}");
+    receipt.writeln("Delivery charges: $_deliveryCharges");
     receipt.writeln();
+    receipt.writeln("Total Price: ${_formatPrice(getTotalPrice())}");
     receipt.writeln('Delivering to: $deliveryAddress ');
     return receipt.toString();
   }
