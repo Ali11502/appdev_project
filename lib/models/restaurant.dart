@@ -25,7 +25,7 @@ class Restaurant extends ChangeNotifier {
   String? get menuError => _menuError;
 
   final List<CartItem> _cart = [];
-  double _deliveryCharges = 9.99;
+  final double _deliveryCharges = 9.99;
   String _deliveryAddress = 'none';
   String get deliveryAddress => _deliveryAddress;
 

@@ -1,6 +1,3 @@
-import 'package:app_dev_project/models/restaurant.dart';
-import 'package:provider/provider.dart';
-
 import '../components/my_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
