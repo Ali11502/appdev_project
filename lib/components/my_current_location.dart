@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../models/restaurant.dart';
+import 'package:app_dev_project/providers/restaurant_provider.dart';
 
 class MyCurrentLocation extends StatelessWidget {
   MyCurrentLocation({super.key});
   final textController = TextEditingController();
+
   void openLocationSearchBox(BuildContext context) {
     showDialog(
       context: context,
@@ -30,12 +30,14 @@ class MyCurrentLocation extends StatelessWidget {
                 onPressed: () {
                   // update delivery address
                   String newAddress = textController.text;
-                  context.read<Restaurant>().updateDeliveryAddress(newAddress);
+                  context.read<RestaurantProvider>().updateDeliveryAddress(
+                    newAddress,
+                  );
                   Navigator.pop(context);
                   textController.clear();
                 },
                 child: const Text("Save"),
-              ), // MaterialButton
+              ),
             ],
           ),
     );
@@ -51,25 +53,29 @@ class MyCurrentLocation extends StatelessWidget {
           Text(
             "Deliver now",
             style: TextStyle(color: Theme.of(context).colorScheme.primary),
-          ), // Text
-          GestureDetector(
-            onTap: () => openLocationSearchBox(context),
-            child: Row(
-              children: [
-                // address
-                Consumer<Restaurant>(
-                  builder:
-                      (context, restaurant, child) => Text(
-                        restaurant.deliveryAddress,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.inversePrimary,
-                          fontWeight: FontWeight.bold,
-                        ), // TextStyle
-                      ), // Text
-                ), // Consumer
-                // drop down menu
-                Icon(Icons.keyboard_arrow_down_rounded),
-              ],
+          ),
+          // Added MouseRegion with pointer cursor
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => openLocationSearchBox(context),
+              child: Row(
+                children: [
+                  // address
+                  Consumer<RestaurantProvider>(
+                    builder:
+                        (context, restaurant, child) => Text(
+                          restaurant.deliveryAddress,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.inversePrimary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                  ),
+                  // drop down menu
+                  const Icon(Icons.keyboard_arrow_down_rounded),
+                ],
+              ),
             ),
           ),
         ],

@@ -1,36 +1,35 @@
-import 'package:app_dev_project/models/restaurant.dart';
 import 'package:app_dev_project/pages/home_page.dart';
 import 'package:app_dev_project/services/database/firestore.dart';
 import 'package:provider/provider.dart';
+import 'package:app_dev_project/providers/restaurant_provider.dart';
 
 import '../components/my_receipt.dart';
-// import '../models/restaurant.dart';
 import 'package:flutter/material.dart';
-// import 'package:provider/provider.dart';
 
-class DeliveryProgressPage extends StatefulWidget {
+class DeliveryProgressPage extends StatelessWidget {
   const DeliveryProgressPage({super.key});
 
-  @override
-  State<DeliveryProgressPage> createState() => _DeliveryProgressPageState();
-}
-
-class _DeliveryProgressPageState extends State<DeliveryProgressPage> {
-  FirestoreService db = FirestoreService();
-  void clearCart() {
-    final restaurant = Provider.of<Restaurant>(context, listen: false);
-    restaurant.clearCart();
+  void clearCart(BuildContext context) {
+    final restaurantProvider = Provider.of<RestaurantProvider>(
+      context,
+      listen: false,
+    );
+    restaurantProvider.clearCart();
   }
 
-  @override
-  void initState() {
-    super.initState();
-    String receipt = context.read<Restaurant>().displayCartReceipt();
+  void saveOrderToDatabase(BuildContext context) {
+    final FirestoreService db = FirestoreService();
+    String receipt = context.read<RestaurantProvider>().displayCartReceipt();
     db.saveOrderToDatabase(receipt);
   }
 
   @override
   Widget build(BuildContext context) {
+    // Save order when page loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      saveOrderToDatabase(context);
+    });
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -38,20 +37,18 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage> {
         leading: IconButton(
           icon: const Icon(Icons.home),
           onPressed: () {
-            clearCart();
+            clearCart(context);
 
             // Navigate to your home page
             Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (context) => HomePage(),
-              ), // Replace YourHomePage with your actual home page widget
+              MaterialPageRoute(builder: (context) => const HomePage()),
               (route) => false,
             );
           },
         ),
       ),
       bottomNavigationBar: _buildBottomNavBar(context),
-      body: SingleChildScrollView(child: const Column(children: [MyReceipt()])),
+      body: const SingleChildScrollView(child: Column(children: [MyReceipt()])),
     );
   }
 
@@ -64,8 +61,8 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage> {
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(40),
           topRight: Radius.circular(40),
-        ), // BorderRadius.only
-      ), // BoxDecoration
+        ),
+      ),
       padding: const EdgeInsets.all(25),
       child: Row(
         children: [
@@ -74,7 +71,7 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage> {
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
               shape: BoxShape.circle,
-            ), // BoxDecoration
+            ),
             child: IconButton(onPressed: () {}, icon: const Icon(Icons.person)),
           ),
           const SizedBox(width: 10),
@@ -84,19 +81,17 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Mitch Koko",
+                "Ali Iqbal",
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                   color: Theme.of(context).colorScheme.inversePrimary,
-                ), // TextStyle
-              ), // Text
+                ),
+              ),
               Text(
                 "Driver",
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.primary,
-                ), // TextStyle
-              ), // Text
+                style: TextStyle(color: Theme.of(context).colorScheme.primary),
+              ),
             ],
           ),
 
@@ -107,7 +102,7 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage> {
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
                   shape: BoxShape.circle,
-                ), // BoxDecoration
+                ),
                 child: IconButton(
                   onPressed: () {},
                   icon: const Icon(Icons.message),
@@ -119,7 +114,7 @@ class _DeliveryProgressPageState extends State<DeliveryProgressPage> {
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
                   shape: BoxShape.circle,
-                ), // BoxDecoration
+                ),
                 child: IconButton(
                   onPressed: () {},
                   icon: const Icon(Icons.call),

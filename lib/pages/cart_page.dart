@@ -1,6 +1,7 @@
+import 'package:app_dev_project/providers/restaurant_provider.dart';
+
 import '../components/my_cart_tile.dart';
 import 'package:flutter/material.dart';
-import '../models/restaurant.dart';
 import 'package:provider/provider.dart';
 import '../components/my_button.dart';
 import 'payment_page.dart';
@@ -62,7 +63,7 @@ class CartPage extends StatelessWidget {
                 onPressed: () {
                   if (textController.text.trim().isNotEmpty) {
                     // Update delivery address
-                    context.read<Restaurant>().updateDeliveryAddress(
+                    context.read<RestaurantProvider>().updateDeliveryAddress(
                       textController.text.trim(),
                     );
                     Navigator.pop(context);
@@ -93,7 +94,7 @@ class CartPage extends StatelessWidget {
 
   // Method to handle checkout button press
   void _handleCheckout(BuildContext context) {
-    final restaurant = Provider.of<Restaurant>(context, listen: false);
+    final restaurant = Provider.of<RestaurantProvider>(context, listen: false);
 
     // If location is 'none', show location dialog
     if (restaurant.deliveryAddress == 'none') {
@@ -109,9 +110,9 @@ class CartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Restaurant>(
-      builder: (context, restaurant, child) {
-        final userCart = restaurant.cart;
+    return Consumer<RestaurantProvider>(
+      builder: (context, restaurantProvider, child) {
+        final userCart = restaurantProvider.cart;
 
         return Scaffold(
           appBar: AppBar(
@@ -121,35 +122,36 @@ class CartPage extends StatelessWidget {
             foregroundColor: Theme.of(context).colorScheme.inversePrimary,
             actions: [
               // clear cart button
-              IconButton(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder:
-                        (context) => AlertDialog(
-                          title: const Text(
-                            "Are you sure you want to clear the cart?",
+              if (userCart.isNotEmpty)
+                IconButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder:
+                          (context) => AlertDialog(
+                            title: const Text(
+                              "Are you sure you want to clear the cart?",
+                            ),
+                            actions: [
+                              // cancel button
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text("Cancel"),
+                              ),
+                              // yes button
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  restaurantProvider.clearCart();
+                                },
+                                child: const Text("Yes"),
+                              ),
+                            ],
                           ),
-                          actions: [
-                            // cancel button
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text("Cancel"),
-                            ),
-                            // yes button
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                restaurant.clearCart();
-                              },
-                              child: const Text("Yes"),
-                            ),
-                          ],
-                        ),
-                  );
-                },
-                icon: const Icon(Icons.delete),
-              ),
+                    );
+                  },
+                  icon: const Icon(Icons.delete),
+                ),
             ],
           ),
 
@@ -173,12 +175,12 @@ class CartPage extends StatelessWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              restaurant.deliveryAddress == 'none'
+                              restaurantProvider.deliveryAddress == 'none'
                                   ? "No address set"
-                                  : restaurant.deliveryAddress,
+                                  : restaurantProvider.deliveryAddress,
                               style: TextStyle(
                                 color:
-                                    restaurant.deliveryAddress == 'none'
+                                    restaurantProvider.deliveryAddress == 'none'
                                         ? Colors.red
                                         : Theme.of(context).colorScheme.primary,
                               ),
@@ -187,7 +189,7 @@ class CartPage extends StatelessWidget {
                           TextButton(
                             onPressed: () => _showLocationInputDialog(context),
                             child: Text(
-                              restaurant.deliveryAddress == 'none'
+                              restaurantProvider.deliveryAddress == 'none'
                                   ? "Set Location"
                                   : "Change",
                               style: TextStyle(

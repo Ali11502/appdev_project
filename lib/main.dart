@@ -1,11 +1,12 @@
 import 'package:app_dev_project/services/auth/auth_gate.dart';
-import 'package:app_dev_project/models/restaurant.dart';
-import 'package:app_dev_project/themes/theme_provider.dart';
+import 'package:app_dev_project/providers/auth_provider.dart'; // Import AuthProvider
+import 'package:app_dev_project/providers/theme_provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'firebase_options.dart';
+import 'providers/restaurant_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,7 +15,10 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
-        ChangeNotifierProvider(create: (context) => Restaurant()),
+        ChangeNotifierProvider(create: (context) => RestaurantProvider()),
+        ChangeNotifierProvider(
+          create: (context) => AuthProvider(),
+        ), // Added AuthProvider
       ],
       child: const MyApp(),
     ),

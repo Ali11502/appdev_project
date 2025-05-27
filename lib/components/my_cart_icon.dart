@@ -1,6 +1,6 @@
+import 'package:app_dev_project/providers/restaurant_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/restaurant.dart';
 import '../pages/cart_page.dart';
 
 class MyCartIcon extends StatelessWidget {
@@ -8,10 +8,10 @@ class MyCartIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Restaurant>(
-      builder: (context, restaurant, child) {
+    return Consumer<RestaurantProvider>(
+      builder: (context, restaurantProvider, child) {
         // Get the total item count using the existing method in your Restaurant model
-        int totalItems = restaurant.getTotalItemCount();
+        int totalItems = restaurantProvider.getTotalItemCount();
 
         return Stack(
           alignment: Alignment.topRight,

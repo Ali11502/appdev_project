@@ -2,13 +2,15 @@ import '../components/my_description_box.dart';
 import '../components/my_drawer.dart';
 import '../components/my_food_tile.dart';
 import '../components/my_tab_bar.dart';
-import '../components/my_menu_loader.dart'; // Add this import
+import '../components/my_menu_loader.dart';
 import '../pages/food_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../components/my_current_location.dart';
 import '../components/my_sliver_app_bar.dart';
 import '../models/food.dart';
+import '../providers/tab_controller_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,23 +21,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(
-      length: FoodCategory.values.length,
-      vsync: this,
-    );
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
   // Sort out and return a list of food items that belong to a specific category
   List<Food> _filterMenuByCategory(FoodCategory category, List<Food> fullMenu) {
     return fullMenu.where((food) => food.category == category).toList();
@@ -66,35 +51,55 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: MyDrawer(),
-      body: NestedScrollView(
-        headerSliverBuilder:
-            (context, innerBoxIsScrolled) => [
-              MySliverAppBar(
-                title: MyTabBar(tabController: _tabController),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Divider(
-                      indent: 25,
-                      endIndent: 25,
-                      color: Theme.of(context).colorScheme.secondary,
+    return ChangeNotifierProvider(
+      create: (context) {
+        final provider = TabControllerProvider();
+        provider.initializeTabController(this); // Pass 'this' as TickerProvider
+        return provider;
+      },
+      child: Consumer<TabControllerProvider>(
+        builder: (context, tabControllerProvider, child) {
+          // Return empty container if tabController is not ready
+          if (tabControllerProvider.tabController == null) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          return Scaffold(
+            drawer: MyDrawer(),
+            body: NestedScrollView(
+              headerSliverBuilder:
+                  (context, innerBoxIsScrolled) => [
+                    MySliverAppBar(
+                      title: MyTabBar(
+                        tabController: tabControllerProvider.tabController!,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Divider(
+                            indent: 25,
+                            endIndent: 25,
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                          MyCurrentLocation(),
+                          // description box
+                          const MyDescriptionBox(),
+                        ],
+                      ),
                     ),
-                    MyCurrentLocation(),
-                    // description box
-                    const MyDescriptionBox(),
                   ],
-                ),
+              body: MyMenuLoader(
+                builder:
+                    (menu) => TabBarView(
+                      controller: tabControllerProvider.tabController!,
+                      children: getFoodInThisCategory(menu),
+                    ),
               ),
-            ],
-        body: MyMenuLoader(
-          builder:
-              (menu) => TabBarView(
-                controller: _tabController,
-                children: getFoodInThisCategory(menu),
-              ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }

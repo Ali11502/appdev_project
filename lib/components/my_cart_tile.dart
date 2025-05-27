@@ -1,8 +1,8 @@
 import 'my_quantity_selector.dart';
 import 'package:flutter/material.dart';
 import '../models/cart_item.dart';
-import '../models/restaurant.dart';
 import 'package:provider/provider.dart';
+import 'package:app_dev_project/providers/restaurant_provider.dart';
 
 class MyCartTile extends StatelessWidget {
   final CartItem cartItem;
@@ -11,9 +11,9 @@ class MyCartTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Restaurant>(
+    return Consumer<RestaurantProvider>(
       builder:
-          (context, restaurant, child) => Container(
+          (context, restaurantProvider, child) => Container(
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.secondary,
               borderRadius: BorderRadius.circular(
@@ -83,10 +83,10 @@ class MyCartTile extends StatelessWidget {
                         quantity: cartItem.quantity,
                         food: cartItem.food,
                         onDecrement: () {
-                          restaurant.removeFromCart(cartItem);
+                          restaurantProvider.removeFromCart(cartItem);
                         },
                         onIncrement: () {
-                          restaurant.addToCart(
+                          restaurantProvider.addToCart(
                             cartItem.food,
                             cartItem.selectedAddons,
                           );

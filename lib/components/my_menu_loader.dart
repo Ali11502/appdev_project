@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/restaurant.dart';
 import '../models/food.dart';
+import 'package:app_dev_project/providers/restaurant_provider.dart';
 
 class MyMenuLoader extends StatelessWidget {
   final Widget Function(List<Food> menu) builder;
@@ -10,10 +10,10 @@ class MyMenuLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Restaurant>(
-      builder: (context, restaurant, child) {
+    return Consumer<RestaurantProvider>(
+      builder: (context, restaurantProvider, child) {
         // Loading State
-        if (restaurant.isMenuLoading) {
+        if (restaurantProvider.isMenuLoading) {
           return const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -30,7 +30,7 @@ class MyMenuLoader extends StatelessWidget {
         }
 
         // Error State
-        if (restaurant.menuError != null) {
+        if (restaurantProvider.menuError != null) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -47,7 +47,7 @@ class MyMenuLoader extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  restaurant.menuError!,
+                  restaurantProvider.menuError!,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -58,7 +58,7 @@ class MyMenuLoader extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
-                  onPressed: () => restaurant.refreshMenu(),
+                  onPressed: () => restaurantProvider.refreshMenu(),
                   icon: const Icon(Icons.refresh),
                   label: const Text('Retry'),
                 ),
@@ -68,7 +68,7 @@ class MyMenuLoader extends StatelessWidget {
         }
 
         // Success State - Menu Loaded
-        if (restaurant.menu.isEmpty) {
+        if (restaurantProvider.menu.isEmpty) {
           return const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -85,7 +85,7 @@ class MyMenuLoader extends StatelessWidget {
         }
 
         // Return the menu to the builder function
-        return builder(restaurant.menu);
+        return builder(restaurantProvider.menu);
       },
     );
   }
