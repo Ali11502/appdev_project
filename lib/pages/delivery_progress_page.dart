@@ -48,7 +48,14 @@ class DeliveryProgressPage extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: _buildBottomNavBar(context),
-      body: const SingleChildScrollView(child: Column(children: [MyReceipt()])),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            // Your existing receipt
+            const MyReceipt(),
+          ],
+        ),
+      ),
     );
   }
 
