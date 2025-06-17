@@ -21,7 +21,7 @@ class QuantitySelector extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(50),
-      ), // BoxDecoration
+      ),
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -51,6 +51,6 @@ class QuantitySelector extends StatelessWidget {
           ),
         ],
       ),
-    ); // Container
+    );
   }
 }

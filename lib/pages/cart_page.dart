@@ -9,11 +9,11 @@ import 'payment_page.dart';
 class CartPage extends StatelessWidget {
   const CartPage({super.key});
 
-  // Method to show location dialog
+  //dialog shown if user tried to proceed without giving location
   void _showLocationDialog(BuildContext context) {
     showDialog(
       context: context,
-      barrierDismissible: false, // User must set a location
+      barrierDismissible: false,
       builder:
           (context) => AlertDialog(
             title: const Text("Delivery Address Required"),
@@ -33,7 +33,6 @@ class CartPage extends StatelessWidget {
     );
   }
 
-  // Method to show location input dialog
   void _showLocationInputDialog(BuildContext context) {
     final textController = TextEditingController();
 
@@ -62,13 +61,11 @@ class CartPage extends StatelessWidget {
               TextButton(
                 onPressed: () {
                   if (textController.text.trim().isNotEmpty) {
-                    // Update delivery address
                     context.read<RestaurantProvider>().updateDeliveryAddress(
                       textController.text.trim(),
                     );
                     Navigator.pop(context);
 
-                    // Now we can proceed to checkout
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -76,7 +73,6 @@ class CartPage extends StatelessWidget {
                       ),
                     );
                   } else {
-                    // Show error if empty address
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text("Please enter a valid address"),
@@ -92,15 +88,12 @@ class CartPage extends StatelessWidget {
     );
   }
 
-  // Method to handle checkout button press
   void _handleCheckout(BuildContext context) {
     final restaurant = Provider.of<RestaurantProvider>(context, listen: false);
 
-    // If location is 'none', show location dialog
     if (restaurant.deliveryAddress == 'none') {
       _showLocationDialog(context);
     } else {
-      // If location is set, proceed to checkout
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const PaymentPage()),
@@ -121,7 +114,6 @@ class CartPage extends StatelessWidget {
             backgroundColor: Theme.of(context).colorScheme.surface,
             foregroundColor: Theme.of(context).colorScheme.inversePrimary,
             actions: [
-              // clear cart button
               if (userCart.isNotEmpty)
                 IconButton(
                   onPressed: () {
@@ -133,12 +125,10 @@ class CartPage extends StatelessWidget {
                               "Are you sure you want to clear the cart?",
                             ),
                             actions: [
-                              // cancel button
                               TextButton(
                                 onPressed: () => Navigator.pop(context),
                                 child: const Text("Cancel"),
                               ),
-                              // yes button
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(context);
@@ -157,7 +147,6 @@ class CartPage extends StatelessWidget {
 
           body: Column(
             children: [
-              // Display current delivery address
               if (userCart.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -213,10 +202,8 @@ class CartPage extends StatelessWidget {
                           child: ListView.builder(
                             itemCount: userCart.length,
                             itemBuilder: (context, index) {
-                              // get individual cart item
                               final cartItem = userCart[index];
 
-                              // return cart tile UI
                               return MyCartTile(cartItem: cartItem);
                             },
                           ),
@@ -224,7 +211,6 @@ class CartPage extends StatelessWidget {
                   ],
                 ),
               ),
-              // button to pay
               if (userCart.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),

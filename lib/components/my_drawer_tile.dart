@@ -21,12 +21,9 @@ class MyDrawerTile extends StatelessWidget {
           color: Theme.of(context).colorScheme.inversePrimary,
           letterSpacing: 5,
         ),
-      ), // Text
-      leading: Icon(
-        icon,
-        color: Theme.of(context).colorScheme.inversePrimary,
-      ), // Icon
+      ),
+      leading: Icon(icon, color: Theme.of(context).colorScheme.inversePrimary),
       onTap: onTap,
-    ); // ListTile
+    );
   }
 }

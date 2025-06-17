@@ -21,7 +21,7 @@ class MyReceipt extends StatelessWidget {
                   color: Theme.of(context).colorScheme.inversePrimary,
                 ),
                 borderRadius: BorderRadius.circular(8),
-              ), // BoxDecoration
+              ),
               padding: const EdgeInsets.all(25),
               child: Consumer<RestaurantProvider>(
                 builder:
@@ -34,7 +34,7 @@ class MyReceipt extends StatelessWidget {
             const Text("Delivery is expected within 30 minutes for now"),
           ],
         ),
-      ), // Column
-    ); // Padding
+      ),
+    );
   }
 }

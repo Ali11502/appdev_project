@@ -6,13 +6,10 @@ import '../models/food.dart';
 import '../services/database/firestore.dart';
 
 class RestaurantProvider extends ChangeNotifier {
-  // Firebase service instance
   final FirestoreService _firestoreService = FirestoreService();
 
-  // Private state - using the pure model
   Restaurant _restaurant = const Restaurant();
 
-  // Getters - expose the model's data (EXACTLY as your original)
   Restaurant get restaurant => _restaurant;
   List<Food> get menu => _restaurant.menu;
   List<CartItem> get cart => _restaurant.cart;
@@ -20,12 +17,10 @@ class RestaurantProvider extends ChangeNotifier {
   String? get menuError => _restaurant.menuError;
   String get deliveryAddress => _restaurant.deliveryAddress;
 
-  // Constructor - automatically load menu when provider is created (SAME AS ORIGINAL)
   RestaurantProvider() {
     loadMenuFromFirebase();
   }
 
-  // Load menu from Firebase (EXACTLY as your original)
   Future<void> loadMenuFromFirebase() async {
     _restaurant = _restaurant.copyWith(isMenuLoading: true, menuError: null);
     notifyListeners();
@@ -39,7 +34,6 @@ class RestaurantProvider extends ChangeNotifier {
       );
     } catch (e) {
       _restaurant = _restaurant.copyWith(
-        menu: Restaurant.getHardcodedMenu(), // Fallback to hardcoded menu
         isMenuLoading: false,
         menuError: 'Failed to load menu: $e',
       );
@@ -47,39 +41,15 @@ class RestaurantProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Refresh menu from Firebase (SAME AS ORIGINAL)
+  // Refresh menu from Firebase
   Future<void> refreshMenu() async {
     await loadMenuFromFirebase();
   }
 
-  // Get menu items by category (EXACTLY as your original)
-  Future<List<Food>> getMenuByCategory(FoodCategory category) async {
-    try {
-      return await _firestoreService.getMenuItemsByCategory(category);
-    } catch (e) {
-      // Fallback to filtering local menu
-      return _restaurant.menu
-          .where((food) => food.category == category)
-          .toList();
-    }
-  }
-
-  // One-time method to migrate hardcoded data to Firebase (EXACTLY as your original)
-  Future<void> migrateHardcodedMenuToFirebase() async {
-    List<Food> hardcodedMenu = Restaurant.getHardcodedMenu();
-    try {
-      await _firestoreService.populateInitialMenuData(hardcodedMenu);
-      print('Successfully migrated menu to Firebase!');
-    } catch (e) {
-      print('Error migrating menu: $e');
-    }
-  }
-
-  // === CART METHODS (EXACTLY as your original logic) ===
   void addToCart(Food food, List<Addon> selectedAddons) {
     final currentCart = List<CartItem>.from(_restaurant.cart);
 
-    // Find existing cart item with same food and addons (SAME LOGIC)
+    // Find existing cart item with same food and addons
     CartItem? existingCartItem = currentCart.firstWhereOrNull((item) {
       bool isSameFood = item.food == food;
       bool isSameAddons = ListEquality().equals(
@@ -90,7 +60,6 @@ class RestaurantProvider extends ChangeNotifier {
     });
 
     if (existingCartItem != null) {
-      // Increase quantity of existing item (SAME AS ORIGINAL)
       final index = currentCart.indexOf(existingCartItem);
       currentCart[index] = CartItem(
         food: existingCartItem.food,
@@ -98,7 +67,6 @@ class RestaurantProvider extends ChangeNotifier {
         quantity: existingCartItem.quantity + 1,
       );
     } else {
-      // Add new item to cart (SAME AS ORIGINAL)
       currentCart.add(CartItem(food: food, selectedAddons: selectedAddons));
     }
 
@@ -112,14 +80,12 @@ class RestaurantProvider extends ChangeNotifier {
 
     if (cartIndex != -1) {
       if (currentCart[cartIndex].quantity > 1) {
-        // Decrease quantity (SAME AS ORIGINAL)
         currentCart[cartIndex] = CartItem(
           food: currentCart[cartIndex].food,
           selectedAddons: currentCart[cartIndex].selectedAddons,
           quantity: currentCart[cartIndex].quantity - 1,
         );
       } else {
-        // Remove item completely (SAME AS ORIGINAL)
         currentCart.removeAt(cartIndex);
       }
     }
@@ -138,7 +104,7 @@ class RestaurantProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Delegate methods to the model (SAME AS ORIGINAL)
+  // Delegate methods to the model
   double getTotalPrice() => _restaurant.getTotalPrice();
   int getTotalItemCount() => _restaurant.getTotalItemCount();
   String displayCartReceipt() => _restaurant.displayCartReceipt();

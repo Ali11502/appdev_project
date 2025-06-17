@@ -5,8 +5,6 @@ import '../components/my_text_field.dart';
 import '../providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/button_press_provider.dart';
-
 class LoginPage extends StatelessWidget {
   final void Function()? onTap;
 
@@ -14,7 +12,6 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Controllers to handle text input
     final TextEditingController emailController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
 
@@ -50,7 +47,6 @@ class LoginPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // App logo - a lock icon
                   Icon(
                     Icons.lock_open_rounded,
                     size: 100,
@@ -58,9 +54,8 @@ class LoginPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 25),
 
-                  // App title
                   Text(
-                    'Food Delivery App',
+                    "A's Kitchen ",
                     style: TextStyle(
                       fontSize: 16,
                       color: Theme.of(context).colorScheme.inversePrimary,
@@ -68,7 +63,6 @@ class LoginPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 25),
 
-                  // Email input field
                   MyTextField(
                     controller: emailController,
                     hintText: "Email",
@@ -77,7 +71,6 @@ class LoginPage extends StatelessWidget {
 
                   const SizedBox(height: 10),
 
-                  // Password input field
                   MyTextField(
                     controller: passwordController,
                     hintText: "Password",
@@ -85,7 +78,6 @@ class LoginPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
 
-                  // Sign in button
                   MyButton(
                     text:
                         authProvider.isEmailLoginLoading
@@ -102,7 +94,6 @@ class LoginPage extends StatelessWidget {
 
                   const SizedBox(height: 20),
 
-                  // Divider with "OR" text
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25.0),
                     child: Row(
@@ -135,7 +126,6 @@ class LoginPage extends StatelessWidget {
 
                   const SizedBox(height: 20),
 
-                  // Google Sign-In button
                   MyGoogleSignInButton(
                     onTap: () => authProvider.signInWithGoogle(),
                     isLoading: authProvider.isGoogleLoginLoading,
@@ -143,56 +133,28 @@ class LoginPage extends StatelessWidget {
 
                   const SizedBox(height: 25),
 
-                  // Register now row with Provider for button press effect
-                  ChangeNotifierProvider(
-                    create: (context) => ButtonPressProvider(),
-                    child: Consumer<ButtonPressProvider>(
-                      builder: (context, buttonPressProvider, child) {
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Not a member?',
-                              style: TextStyle(
-                                color:
-                                    Theme.of(
-                                      context,
-                                    ).colorScheme.inversePrimary,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-
-                            // Using MouseRegion to change cursor on web platforms
-                            MouseRegion(
-                              cursor: SystemMouseCursors.click,
-                              child: GestureDetector(
-                                onTap: onTap,
-                                // Add feedback effects for tap interactions
-                                onTapDown:
-                                    (_) => buttonPressProvider.onTapDown(),
-                                onTapUp: (_) => buttonPressProvider.onTapUp(),
-                                onTapCancel:
-                                    () => buttonPressProvider.onTapCancel(),
-                                child: Text(
-                                  'Register now',
-                                  style: TextStyle(
-                                    color:
-                                        buttonPressProvider.isPressed
-                                            ? Theme.of(
-                                              context,
-                                            ).colorScheme.primary
-                                            : Theme.of(
-                                              context,
-                                            ).colorScheme.inversePrimary,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
+                  // Register now n
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Not a member?',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.inversePrimary,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      GestureDetector(
+                        onTap: onTap,
+                        child: Text(
+                          'Register now',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

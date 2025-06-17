@@ -25,7 +25,7 @@ class DeliveryProgressPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Save order when page loads
+    // Save order immediately when page loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       saveOrderToDatabase(context);
     });
@@ -33,13 +33,13 @@ class DeliveryProgressPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: false, // Removes the default back button
+        automaticallyImplyLeading: false,
         leading: IconButton(
           icon: const Icon(Icons.home),
           onPressed: () {
             clearCart(context);
 
-            // Navigate to your home page
+            // go back to home, clearing routes
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (context) => const HomePage()),
               (route) => false,
@@ -48,18 +48,10 @@ class DeliveryProgressPage extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: _buildBottomNavBar(context),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Your existing receipt
-            const MyReceipt(),
-          ],
-        ),
-      ),
+      body: SingleChildScrollView(child: Column(children: [const MyReceipt()])),
     );
   }
 
-  // Custom Bottom Nav Bar - Message / Call delivery driver
   Widget _buildBottomNavBar(BuildContext context) {
     return Container(
       height: 100,
@@ -73,17 +65,15 @@ class DeliveryProgressPage extends StatelessWidget {
       padding: const EdgeInsets.all(25),
       child: Row(
         children: [
-          // profile pic of driver
           Container(
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
               shape: BoxShape.circle,
             ),
-            child: IconButton(onPressed: () {}, icon: const Icon(Icons.person)),
+            child: const Icon(Icons.person),
           ),
           const SizedBox(width: 10),
 
-          // driver details
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

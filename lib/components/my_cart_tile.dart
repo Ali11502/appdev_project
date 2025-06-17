@@ -9,6 +9,65 @@ class MyCartTile extends StatelessWidget {
 
   const MyCartTile({super.key, required this.cartItem});
 
+  bool _isNetworkImage(String imagePath) {
+    return imagePath.startsWith('http://') || imagePath.startsWith('https://');
+  }
+
+  Widget _buildImage(String imagePath, BuildContext context) {
+    if (_isNetworkImage(imagePath)) {
+      return Image.network(
+        imagePath,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            color: Colors.grey.withValues(alpha: 0.1),
+            child: Center(
+              child: CircularProgressIndicator(
+                value:
+                    loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                        : null,
+                strokeWidth: 2,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Colors.grey.withValues(alpha: 0.1),
+            child: Icon(
+              Icons.image_not_supported,
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.5),
+              size: 30,
+            ),
+          );
+        },
+      );
+    } else {
+      return Image.asset(
+        imagePath,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Colors.grey.withValues(alpha: 0.1),
+            child: Icon(
+              Icons.image_not_supported,
+              color: Theme.of(
+                context,
+              ).colorScheme.onSurface.withValues(alpha: 0.5),
+              size: 30,
+            ),
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<RestaurantProvider>(
@@ -16,44 +75,32 @@ class MyCartTile extends StatelessWidget {
           (context, restaurantProvider, child) => Container(
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.secondary,
-              borderRadius: BorderRadius.circular(
-                12,
-              ), // Increased radius for better look
+              borderRadius: BorderRadius.circular(12),
             ),
             margin: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(
-                    10.0,
-                  ), // Slightly increased padding
+                  padding: const EdgeInsets.all(10.0),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Updated image container with better handling
                       Container(
-                        width:
-                            80, // Slightly reduced width to ensure no overflow
-                        height: 80, // Increased height for better aspect ratio
+                        width: 80,
+                        height: 80,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12.0),
-                          // Add a slight background color to handle transparent images better
+
                           color: Colors.grey.withValues(alpha: 0.1),
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12.0),
-                          child: Image.asset(
-                            cartItem.food.imagePath,
-                            fit:
-                                BoxFit
-                                    .cover, // This ensures the image covers the area properly
-                          ),
+                          child: _buildImage(cartItem.food.imagePath, context),
                         ),
                       ),
-                      const SizedBox(width: 15), // Increased spacing
-                      // Text content with improved spacing and styling
+                      const SizedBox(width: 15),
+
                       Expanded(
-                        // Use Expanded instead of just Column to handle text overflow
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -63,8 +110,7 @@ class MyCartTile extends StatelessWidget {
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
-                              overflow:
-                                  TextOverflow.ellipsis, // Handle long names
+                              overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -78,7 +124,6 @@ class MyCartTile extends StatelessWidget {
                         ),
                       ),
 
-                      // Quantity selector
                       QuantitySelector(
                         quantity: cartItem.quantity,
                         food: cartItem.food,
@@ -95,10 +140,9 @@ class MyCartTile extends StatelessWidget {
                     ],
                   ),
                 ),
-                // Addons section with improved layout
                 if (cartItem.selectedAddons.isNotEmpty)
                   Container(
-                    height: 50, // Fixed height
+                    height: 50,
                     margin: const EdgeInsets.only(bottom: 10),
                     child: ListView(
                       scrollDirection: Axis.horizontal,

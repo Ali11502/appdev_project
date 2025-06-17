@@ -4,15 +4,12 @@ import '../services/auth/auth_service.dart';
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
 
-  // Loading states
   bool _isEmailLoginLoading = false;
   bool _isEmailRegisterLoading = false;
   bool _isGoogleLoginLoading = false;
 
-  // Error states
   String? _errorMessage;
 
-  // Getters
   bool get isEmailLoginLoading => _isEmailLoginLoading;
   bool get isEmailRegisterLoading => _isEmailRegisterLoading;
   bool get isGoogleLoginLoading => _isGoogleLoginLoading;
@@ -20,13 +17,11 @@ class AuthProvider extends ChangeNotifier {
   bool get isAnyLoading =>
       _isEmailLoginLoading || _isEmailRegisterLoading || _isGoogleLoginLoading;
 
-  // Clear error message
   void clearError() {
     _errorMessage = null;
     notifyListeners();
   }
 
-  // Email/Password Login
   Future<void> signInWithEmail(String email, String password) async {
     if (_isEmailLoginLoading) return;
 
@@ -44,7 +39,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // Email/Password Registration
   Future<void> signUpWithEmail(
     String email,
     String password,
@@ -52,7 +46,6 @@ class AuthProvider extends ChangeNotifier {
   ) async {
     if (_isEmailRegisterLoading) return;
 
-    // Check if passwords match
     if (password != confirmPassword) {
       _errorMessage = "Passwords don't match";
       notifyListeners();
@@ -73,7 +66,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // Google Sign-In
   Future<void> signInWithGoogle() async {
     if (_isGoogleLoginLoading) return;
 
@@ -91,7 +83,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // Sign Out
   Future<void> signOut() async {
     try {
       await _authService.signOut();
@@ -101,7 +92,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  // Get current user info
   String? getCurrentUserEmail() {
     return _authService.getCurrentUser()?.email;
   }

@@ -1,7 +1,6 @@
-// food item
 class Food {
-  final String name; // cheese burger
-  final String description; // a burger
+  final String name;
+  final String description;
   final String imagePath;
   final double price;
   final FoodCategory category;
@@ -16,20 +15,18 @@ class Food {
     required this.availableAddons,
   });
 
-  // Convert Food object to Map for Firestore
   Map<String, dynamic> toJson() {
     return {
       'name': name,
       'description': description,
       'imagePath': imagePath,
       'price': price,
-      'category': category.toString().split('.').last, // Convert enum to string
+      'category': category.toString().split('.').last,
       'availableAddons':
           availableAddons.map((addon) => addon.toJson()).toList(),
     };
   }
 
-  // Create Food object from Firestore Map
   factory Food.fromJson(Map<String, dynamic> json) {
     return Food(
       name: json['name'] ?? '',
@@ -47,7 +44,6 @@ class Food {
     );
   }
 
-  // Helper method to convert string back to enum
   static FoodCategory _categoryFromString(String categoryString) {
     switch (categoryString.toLowerCase()) {
       case 'burgers':
@@ -61,27 +57,25 @@ class Food {
       case 'drinks':
         return FoodCategory.drinks;
       default:
-        return FoodCategory.burgers; // Default fallback
+        return FoodCategory.burgers;
     }
   }
 }
 
-// food categories
 enum FoodCategory { burgers, salads, sides, desserts, drinks }
 
-// food addons
 class Addon {
   String name;
   double price;
 
   Addon({required this.name, required this.price});
 
-  // Convert Addon object to Map for Firestore
+  // create addon object for the data to firestore
   Map<String, dynamic> toJson() {
     return {'name': name, 'price': price};
   }
 
-  // Create Addon object from Firestore Map
+  // create addon object from the data by firestore
   factory Addon.fromJson(Map<String, dynamic> json) {
     return Addon(
       name: json['name'] ?? '',

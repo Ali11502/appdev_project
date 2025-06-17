@@ -15,6 +15,114 @@ class FoodPage extends StatelessWidget {
     Navigator.pop(context);
   }
 
+  bool _isNetworkImage(String imagePath) {
+    return imagePath.startsWith('http://') || imagePath.startsWith('https://');
+  }
+
+  Widget _buildImage(String imagePath, BuildContext context) {
+    if (_isNetworkImage(imagePath)) {
+      return Image.network(
+        imagePath,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            color: Theme.of(context).colorScheme.surface,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    value:
+                        loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                    strokeWidth: 3,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Loading image...',
+                    style: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.7),
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Theme.of(context).colorScheme.surface,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.image_not_supported,
+                    size: 80,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Image not available',
+                    style: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.7),
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    } else {
+      return Image.asset(
+        imagePath,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Theme.of(context).colorScheme.surface,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.image_not_supported,
+                    size: 80,
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Image not available',
+                    style: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withValues(alpha: 0.7),
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -27,13 +135,10 @@ class FoodPage extends StatelessWidget {
                 body: SingleChildScrollView(
                   child: Column(
                     children: [
-                      // Image that fills width, adjusts height automatically
                       Container(
                         width: MediaQuery.of(context).size.width,
                         constraints: BoxConstraints(
-                          maxHeight:
-                              MediaQuery.of(context).size.height *
-                              0.4, // Max 40% of screen height
+                          maxHeight: MediaQuery.of(context).size.height * 0.4,
                         ),
                         decoration: BoxDecoration(
                           boxShadow: [
@@ -49,50 +154,8 @@ class FoodPage extends StatelessWidget {
                             bottomLeft: Radius.circular(20),
                             bottomRight: Radius.circular(20),
                           ),
-                          child: AspectRatio(
-                            aspectRatio:
-                                16 /
-                                10, // Reasonable aspect ratio for food images
-                            child: Image.asset(
-                              food.imagePath,
-                              fit:
-                                  BoxFit
-                                      .cover, // Fills the aspect ratio container
-                              errorBuilder: (context, error, stackTrace) {
-                                // Fallback if image fails to load
-                                return Container(
-                                  color: Theme.of(context).colorScheme.surface,
-                                  child: Center(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.image_not_supported,
-                                          size: 80,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface
-                                              .withValues(alpha: 0.5),
-                                        ),
-                                        const SizedBox(height: 16),
-                                        Text(
-                                          'Image not available',
-                                          style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface
-                                                .withValues(alpha: 0.7),
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
+
+                          child: _buildImage(food.imagePath, context),
                         ),
                       ),
 
@@ -141,7 +204,6 @@ class FoodPage extends StatelessWidget {
                             ),
                             const SizedBox(height: 16),
 
-                            // Description section
                             Text(
                               'Description',
                               style: TextStyle(
@@ -167,7 +229,7 @@ class FoodPage extends StatelessWidget {
                             const SizedBox(height: 20),
 
                             Divider(
-                              color: Theme.of(context).colorScheme.secondary,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                             const SizedBox(height: 20),
 
@@ -189,7 +251,7 @@ class FoodPage extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   border: Border.all(
                                     color:
-                                        Theme.of(context).colorScheme.secondary,
+                                        Theme.of(context).colorScheme.primary,
                                   ),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -237,7 +299,7 @@ class FoodPage extends StatelessWidget {
                               ),
                               const SizedBox(height: 20),
                             ] else ...[
-                              // Show message when no add-ons available
+                              // no add-ons available
                               Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
@@ -273,7 +335,6 @@ class FoodPage extends StatelessWidget {
                         ),
                       ),
 
-                      // Add to cart button
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 25.0),
                         child: MyButton(
@@ -292,7 +353,6 @@ class FoodPage extends StatelessWidget {
                 ),
               ),
 
-              // Back button
               SafeArea(
                 child: Container(
                   margin: const EdgeInsets.only(left: 20, top: 20),

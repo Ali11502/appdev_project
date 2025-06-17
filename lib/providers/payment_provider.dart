@@ -8,7 +8,6 @@ class PaymentProvider extends ChangeNotifier {
   bool _isCvvFocused = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  // Getters
   String get cardNumber => _cardNumber;
   String get expiryDate => _expiryDate;
   String get cardHolderName => _cardHolderName;
@@ -16,7 +15,6 @@ class PaymentProvider extends ChangeNotifier {
   bool get isCvvFocused => _isCvvFocused;
   GlobalKey<FormState> get formKey => _formKey;
 
-  // Update credit card data
   void updateCreditCardData({
     required String cardNumber,
     required String expiryDate,
@@ -30,26 +28,7 @@ class PaymentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Update CVV focus
-  void updateCvvFocus(bool isFocused) {
-    if (_isCvvFocused != isFocused) {
-      _isCvvFocused = isFocused;
-      notifyListeners();
-    }
-  }
-
-  // Validate form
   bool validateForm() {
     return _formKey.currentState?.validate() ?? false;
-  }
-
-  // Clear all data
-  void clearPaymentData() {
-    _cardNumber = '';
-    _expiryDate = '';
-    _cardHolderName = '';
-    _cvvCode = '';
-    _isCvvFocused = false;
-    notifyListeners();
   }
 }

@@ -10,7 +10,7 @@ class MyCartIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<RestaurantProvider>(
       builder: (context, restaurantProvider, child) {
-        // Get the total item count using the existing method in your Restaurant model
+        // Get the total item count using the method implemented in the Restaurant model
         int totalItems = restaurantProvider.getTotalItemCount();
 
         return Stack(
@@ -25,11 +25,9 @@ class MyCartIcon extends StatelessWidget {
               },
               icon: const Icon(Icons.shopping_cart),
             ),
-            // Only show the badge if there are items in the cart
+            // if no item in cart then don't show badge
             if (totalItems > 0)
               Positioned(
-                // bottom: 5,
-                // right: 5,
                 child: Container(
                   padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(

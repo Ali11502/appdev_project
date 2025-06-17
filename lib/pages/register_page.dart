@@ -5,8 +5,6 @@ import '../components/my_google_signin_button.dart';
 import '../providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/button_press_provider.dart';
-
 class RegisterPage extends StatelessWidget {
   final void Function()? onTap;
 
@@ -14,7 +12,6 @@ class RegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Controllers to handle text input
     final TextEditingController emailController = TextEditingController();
     final TextEditingController passwordController = TextEditingController();
     final TextEditingController confirmPasswordController =
@@ -24,7 +21,6 @@ class RegisterPage extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {
-          // Show error dialog if there's an error
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (authProvider.errorMessage != null) {
               showDialog(
@@ -52,7 +48,6 @@ class RegisterPage extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // App logo - a lock icon
                   Icon(
                     Icons.lock_open_rounded,
                     size: 100,
@@ -60,7 +55,6 @@ class RegisterPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 25),
 
-                  // App title
                   Text(
                     "Let's create an account",
                     style: TextStyle(
@@ -70,7 +64,6 @@ class RegisterPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 25),
 
-                  // Email input field
                   MyTextField(
                     controller: emailController,
                     hintText: "Email",
@@ -79,7 +72,6 @@ class RegisterPage extends StatelessWidget {
 
                   const SizedBox(height: 10),
 
-                  // Password input field
                   MyTextField(
                     controller: passwordController,
                     hintText: "Password",
@@ -87,7 +79,6 @@ class RegisterPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
 
-                  // Confirm Password input field
                   MyTextField(
                     controller: confirmPasswordController,
                     hintText: "Confirm password",
@@ -95,7 +86,6 @@ class RegisterPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
 
-                  // Sign up button
                   MyButton(
                     text:
                         authProvider.isEmailRegisterLoading
@@ -113,7 +103,6 @@ class RegisterPage extends StatelessWidget {
 
                   const SizedBox(height: 20),
 
-                  // Divider with "OR" text
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 25.0),
                     child: Row(
@@ -146,7 +135,6 @@ class RegisterPage extends StatelessWidget {
 
                   const SizedBox(height: 20),
 
-                  // Google Sign-In button
                   MyGoogleSignInButton(
                     onTap: () => authProvider.signInWithGoogle(),
                     isLoading: authProvider.isGoogleLoginLoading,
@@ -154,56 +142,27 @@ class RegisterPage extends StatelessWidget {
 
                   const SizedBox(height: 25),
 
-                  // Already have an account? with Provider for button press effect
-                  ChangeNotifierProvider(
-                    create: (context) => ButtonPressProvider(),
-                    child: Consumer<ButtonPressProvider>(
-                      builder: (context, buttonPressProvider, child) {
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Already have an account?',
-                              style: TextStyle(
-                                color:
-                                    Theme.of(
-                                      context,
-                                    ).colorScheme.inversePrimary,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-
-                            // Using MouseRegion to change cursor on web platforms
-                            MouseRegion(
-                              cursor: SystemMouseCursors.click,
-                              child: GestureDetector(
-                                onTap: onTap,
-                                // Add feedback effects for tap interactions
-                                onTapDown:
-                                    (_) => buttonPressProvider.onTapDown(),
-                                onTapUp: (_) => buttonPressProvider.onTapUp(),
-                                onTapCancel:
-                                    () => buttonPressProvider.onTapCancel(),
-                                child: Text(
-                                  'Login now',
-                                  style: TextStyle(
-                                    color:
-                                        buttonPressProvider.isPressed
-                                            ? Theme.of(
-                                              context,
-                                            ).colorScheme.primary
-                                            : Theme.of(
-                                              context,
-                                            ).colorScheme.inversePrimary,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Already have an account?',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.inversePrimary,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      GestureDetector(
+                        onTap: onTap,
+                        child: Text(
+                          'Login now',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

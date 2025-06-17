@@ -34,6 +34,7 @@ class _HomePageState extends State<HomePage>
       return ListView.builder(
         itemCount: categoryMenu.length,
         physics: const NeverScrollableScrollPhysics(),
+        padding: EdgeInsets.zero,
         itemBuilder: (context, index) {
           final food = categoryMenu[index];
           return FoodTile(
@@ -54,12 +55,11 @@ class _HomePageState extends State<HomePage>
     return ChangeNotifierProvider(
       create: (context) {
         final provider = TabControllerProvider();
-        provider.initializeTabController(this); // Pass 'this' as TickerProvider
+        provider.initializeTabController(this);
         return provider;
       },
       child: Consumer<TabControllerProvider>(
         builder: (context, tabControllerProvider, child) {
-          // Return empty container if tabController is not ready
           if (tabControllerProvider.tabController == null) {
             return const Scaffold(
               body: Center(child: CircularProgressIndicator()),
@@ -84,18 +84,21 @@ class _HomePageState extends State<HomePage>
                             color: Theme.of(context).colorScheme.secondary,
                           ),
                           MyCurrentLocation(),
-                          // description box
                           const MyDescriptionBox(),
                         ],
                       ),
                     ),
                   ],
-              body: MyMenuLoader(
-                builder:
-                    (menu) => TabBarView(
-                      controller: tabControllerProvider.tabController!,
-                      children: getFoodInThisCategory(menu),
-                    ),
+              body: Container(
+                child: MyMenuLoader(
+                  builder:
+                      (menu) => Container(
+                        child: TabBarView(
+                          controller: tabControllerProvider.tabController!,
+                          children: getFoodInThisCategory(menu),
+                        ),
+                      ),
+                ),
               ),
             ),
           );

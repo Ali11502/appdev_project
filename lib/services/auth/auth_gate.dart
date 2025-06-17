@@ -1,4 +1,3 @@
-// check whether the current user is loggin or not
 import 'package:app_dev_project/services/auth/login_or_register.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -13,16 +12,13 @@ class AuthGate extends StatelessWidget {
       body: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
-          // user is logged in
           if (snapshot.hasData) {
             return const HomePage();
-          }
-          // user is NOT logged in
-          else {
+          } else {
             return const LoginOrRegister();
           }
-        }, // StreamBuilder
-      ), // Scaffold
+        },
+      ),
     );
   }
 }

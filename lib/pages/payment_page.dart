@@ -9,9 +9,8 @@ class PaymentPage extends StatelessWidget {
   const PaymentPage({super.key});
 
   void userTappedPay(BuildContext context, PaymentProvider paymentProvider) {
-    // Check if form is valid before showing dialog - SAME AS BEFORE
+    // Check if form is valid before showing dialog
     if (paymentProvider.validateForm()) {
-      // only show dialog if form is valid
       showDialog(
         context: context,
         builder:
@@ -48,7 +47,6 @@ class PaymentPage extends StatelessWidget {
             ),
       );
     }
-    // If form is not valid, dialog won't show - SAME AS BEFORE
   }
 
   @override
@@ -65,38 +63,40 @@ class PaymentPage extends StatelessWidget {
               title: const Text("Checkout"),
               centerTitle: true,
             ),
-            body: Column(
-              children: [
-                CreditCardWidget(
-                  cardNumber: paymentProvider.cardNumber,
-                  expiryDate: paymentProvider.expiryDate,
-                  cardHolderName: paymentProvider.cardHolderName,
-                  cvvCode: paymentProvider.cvvCode,
-                  showBackView: paymentProvider.isCvvFocused,
-                  onCreditCardWidgetChange: (p0) {},
-                ),
-                CreditCardForm(
-                  cardNumber: paymentProvider.cardNumber,
-                  expiryDate: paymentProvider.expiryDate,
-                  cardHolderName: paymentProvider.cardHolderName,
-                  cvvCode: paymentProvider.cvvCode,
-                  onCreditCardModelChange: (data) {
-                    paymentProvider.updateCreditCardData(
-                      cardNumber: data.cardNumber,
-                      expiryDate: data.expiryDate,
-                      cardHolderName: data.cardHolderName,
-                      cvvCode: data.cvvCode,
-                    );
-                  },
-                  formKey: paymentProvider.formKey, // Use Provider's form key
-                ),
-                const Spacer(),
-                MyButton(
-                  text: "Pay now",
-                  onTap: () => userTappedPay(context, paymentProvider),
-                ),
-                const SizedBox(height: 25),
-              ],
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  CreditCardWidget(
+                    cardNumber: paymentProvider.cardNumber,
+                    expiryDate: paymentProvider.expiryDate,
+                    cardHolderName: paymentProvider.cardHolderName,
+                    cvvCode: paymentProvider.cvvCode,
+                    showBackView: paymentProvider.isCvvFocused,
+                    onCreditCardWidgetChange: (p0) {},
+                  ),
+                  CreditCardForm(
+                    cardNumber: paymentProvider.cardNumber,
+                    expiryDate: paymentProvider.expiryDate,
+                    cardHolderName: paymentProvider.cardHolderName,
+                    cvvCode: paymentProvider.cvvCode,
+                    onCreditCardModelChange: (data) {
+                      paymentProvider.updateCreditCardData(
+                        cardNumber: data.cardNumber,
+                        expiryDate: data.expiryDate,
+                        cardHolderName: data.cardHolderName,
+                        cvvCode: data.cvvCode,
+                      );
+                    },
+                    formKey: paymentProvider.formKey,
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.1),
+                  MyButton(
+                    text: "Pay now",
+                    onTap: () => userTappedPay(context, paymentProvider),
+                  ),
+                  const SizedBox(height: 25),
+                ],
+              ),
             ),
           );
         },

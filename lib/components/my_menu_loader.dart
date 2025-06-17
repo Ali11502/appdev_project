@@ -12,7 +12,7 @@ class MyMenuLoader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<RestaurantProvider>(
       builder: (context, restaurantProvider, child) {
-        // Loading State
+        // loading
         if (restaurantProvider.isMenuLoading) {
           return const Center(
             child: Column(
@@ -29,7 +29,7 @@ class MyMenuLoader extends StatelessWidget {
           );
         }
 
-        // Error State
+        // error loading menu
         if (restaurantProvider.menuError != null) {
           return Center(
             child: Column(
@@ -67,7 +67,7 @@ class MyMenuLoader extends StatelessWidget {
           );
         }
 
-        // Success State - Menu Loaded
+        // empty menu Loaded
         if (restaurantProvider.menu.isEmpty) {
           return const Center(
             child: Column(
@@ -84,7 +84,7 @@ class MyMenuLoader extends StatelessWidget {
           );
         }
 
-        // Return the menu to the builder function
+        // build the menu
         return builder(restaurantProvider.menu);
       },
     );

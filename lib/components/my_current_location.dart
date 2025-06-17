@@ -16,7 +16,6 @@ class MyCurrentLocation extends StatelessWidget {
               controller: textController,
               decoration: const InputDecoration(hintText: "Enter address..."),
             ),
-
             actions: [
               MaterialButton(
                 onPressed: () {
@@ -25,10 +24,8 @@ class MyCurrentLocation extends StatelessWidget {
                 },
                 child: const Text('Cancel'),
               ),
-
               MaterialButton(
                 onPressed: () {
-                  // update delivery address
                   String newAddress = textController.text;
                   context.read<RestaurantProvider>().updateDeliveryAddress(
                     newAddress,
@@ -54,28 +51,22 @@ class MyCurrentLocation extends StatelessWidget {
             "Deliver now",
             style: TextStyle(color: Theme.of(context).colorScheme.primary),
           ),
-          // Added MouseRegion with pointer cursor
-          MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              onTap: () => openLocationSearchBox(context),
-              child: Row(
-                children: [
-                  // address
-                  Consumer<RestaurantProvider>(
-                    builder:
-                        (context, restaurant, child) => Text(
-                          restaurant.deliveryAddress,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.inversePrimary,
-                            fontWeight: FontWeight.bold,
-                          ),
+          GestureDetector(
+            onTap: () => openLocationSearchBox(context),
+            child: Row(
+              children: [
+                Consumer<RestaurantProvider>(
+                  builder:
+                      (context, restaurant, child) => Text(
+                        restaurant.deliveryAddress,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.inversePrimary,
+                          fontWeight: FontWeight.bold,
                         ),
-                  ),
-                  // drop down menu
-                  const Icon(Icons.keyboard_arrow_down_rounded),
-                ],
-              ),
+                      ),
+                ),
+                const Icon(Icons.keyboard_arrow_down_rounded),
+              ],
             ),
           ),
         ],
