@@ -173,8 +173,7 @@ void main() {
                   ),
 
                   const SizedBox(height: 24),
-
-                  // Food tile section
+                  //food tile
                   const Text(
                     'Food Tile:',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

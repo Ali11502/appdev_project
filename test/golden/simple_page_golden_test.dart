@@ -4,12 +4,9 @@ import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:provider/provider.dart';
 import 'package:network_image_mock/network_image_mock.dart';
 
-// Import your pages
 import 'package:app_dev_project/pages/food_page.dart';
 import 'package:app_dev_project/providers/restaurant_provider.dart';
-// Import models
 import 'package:app_dev_project/models/food.dart';
-import 'package:app_dev_project/models/restaurant.dart';
 
 void main() {
   group('Simple Page Golden Tests', () {
@@ -17,7 +14,6 @@ void main() {
       await loadAppFonts();
     });
 
-    // Helper to create test widget with providers (no Firebase dependencies)
     Widget createTestApp(Widget child) {
       return MultiProvider(
         providers: [
@@ -30,7 +26,6 @@ void main() {
     }
 
     testGoldens('Food Page golden test', (tester) async {
-      // Create a mock food item for testing
       final mockFood = Food(
         name: 'Test Burger',
         description:
@@ -53,14 +48,13 @@ void main() {
     });
 
     testGoldens('Food Page with no addons', (tester) async {
-      // Test food page with no addons
       final mockFoodNoAddons = Food(
         name: 'Simple Salad',
         description: 'A simple salad with no additional options.',
         imagePath: 'lib/images/salads/salads.jpg',
         price: 8.99,
         category: FoodCategory.salads,
-        availableAddons: [], // No addons
+        availableAddons: [],
       );
 
       await mockNetworkImagesFor(() async {
@@ -77,7 +71,6 @@ void main() {
     });
 
     testGoldens('Food Page long content test', (tester) async {
-      // Test with very long food name and description
       final longContentFood = Food(
         name:
             'Super Deluxe Extra Large Burger with Lots of Ingredients and a Very Long Name',
@@ -109,7 +102,6 @@ void main() {
     });
 
     testGoldens('Food Page different categories', (tester) async {
-      // Test different food categories
       final foods = [
         Food(
           name: 'Classic Burger',

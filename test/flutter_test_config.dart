@@ -8,7 +8,6 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
       await testMain();
     },
     config: GoldenToolkitConfiguration(
-      // Simple configuration for basic golden tests
       skipGoldenAssertion: () => false,
       // Default devices for testing
       defaultDevices: const [Device.phone],
